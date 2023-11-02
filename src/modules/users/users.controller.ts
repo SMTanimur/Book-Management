@@ -1,8 +1,47 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
+import {
+  Controller,
+  Body,
+  Patch,
+  SerializeOptions,
+  Request,
+  Get,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
 
-import { Controller } from '@nestjs/common';
+import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller()
-export class UsersController {}
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { User } from './schema';
+import { Role } from 'src/constants/roles.enum';
+import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
+import { Roles } from 'src/constants/roles.decorators';
+
+@ApiTags(User.name)
+@Controller({ path: 'users', version: '1' })
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @ApiOperation({ summary: 'User  Profile' })
+  @ApiOkResponse({ description: 'success' })
+  @Get('me')
+  @UseGuards(AuthenticatedGuard)
+  @Roles(Role.USER, Role.ADMIN)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async profile(@Req() req: any) {
+    return await this.usersService.userFindOne(req?.user?._id);
+  }
+  @ApiOperation({ summary: 'Update user' })
+  @ApiCreatedResponse({ description: 'User successfully updated' })
+  @Patch()
+  updateUser(@Body() updateUserDto: UpdateUserDto, @Request() request) {
+    updateUserDto.userId = request.user._id;
+    return this.usersService.update(updateUserDto);
+  }
+}
