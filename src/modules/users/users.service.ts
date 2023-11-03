@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,10 +10,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { createHash } from 'src/utils/hash';
 import { LoginDto } from '../auth/dto/login.dto';
 import { pick } from 'lodash';
+import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './schema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -84,5 +88,33 @@ export class UsersService {
     return {
       message: 'successfully updated user',
     };
+  }
+
+  async changePassword(changePasswordInput: ChangePasswordDto) {
+    const user = await this.userModel.findOne({
+      _id: changePasswordInput.user._id,
+    });
+
+    try {
+      const isValidPass = await user.comparePassword(
+        changePasswordInput.oldPassword,
+      );
+      console.log(isValidPass, 'jdfs');
+      if (isValidPass) {
+        const password = await bcrypt.hash(changePasswordInput.newPassword, 10);
+        await this.update({
+          userId: changePasswordInput.user._id,
+          password,
+        });
+
+        return {
+          message: 'Password change successful',
+        };
+      } else {
+        throw new ConflictException('Invalid password');
+      }
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

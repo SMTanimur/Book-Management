@@ -19,7 +19,6 @@ export class CustomStrategy extends PassportStrategy(Strategy) {
         'The email or password you entered is incorrect.',
       );
     }
-
     return user;
   }
 }
