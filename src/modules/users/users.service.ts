@@ -54,12 +54,11 @@ export class UsersService {
     }
     if (user.role !== role)
       throw new UnauthorizedException('You are not authorized to login.');
-    console.log(user);
     return pick(user.toJSON(), [
       '_id',
       'username',
       'email',
-      'name',
+      'fullName',
       'role',
       'avatar',
     ]);
@@ -76,8 +75,14 @@ export class UsersService {
 
   async userFindOne(id: string) {
     const user = await this.userModel.findOne({ _id: id });
-    delete user.password;
-    return user;
+    return pick(user.toJSON(), [
+      '_id',
+      'username',
+      'email',
+      'fullName',
+      'role',
+      'avatar',
+    ]);
   }
 
   async update(updateUserDto: UpdateUserDto) {
