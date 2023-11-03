@@ -60,15 +60,42 @@ $ npm run test:cov
 
 ## Features
 
-- Register a new user.
-- Add Swagger
-- Authenticate a user and save session cookie 
-- Retrieve details of theauthenticated user 
-- Update the profile of theauthenticated user.
-- Book Management (as
-previously described, but now require user authentication to access):
--  Only authenticated users can add, update, or
-delete books.
+
+1. Implement Session base
+authentication using Spring Security.
+
+
+
+2. Users should be able
+to change their password.
+
+
+
+3. Add basic validation
+for user details during registration (e.g., email format, password complexity).
+
+
+
+4. Implement a global
+exception handler for common exceptions, especially authentication and
+authorization-related exceptions.
+
+
+
+Optional (for Bonus Points):
+
+
+
+1. Allow users to
+maintain a personal collection of books. A user can add a book to their
+collection, remove books from their collection, or view their collection.
+
+
+2. Implement a
+role-based access control system, where certain operations (e.g., deleting any
+book) might be restricted to users with an 'admin' role.
+
+
 
 ## Support
 swagger run on http://localhost:4444/docs
